@@ -1,39 +1,3 @@
-// /// middlewares/auth.ts
-// import { Request, Response, NextFunction } from "express";
-// import jwt from "jsonwebtoken";
-// import httpStatus from "http-status-codes";
-// import AppError from "../errorHelpers/AppError";
-// import { envVars } from "../config/env";
-
-// export const auth = (...requiredRoles: string[]) => {
-//   return (req: Request, res: Response, next: NextFunction) => {
-//     const authHeader = req.headers.authorization;
-// const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
-// console.log("Auth Header:", authHeader);
-// console.log("Extracted Token:", token);
-// console.log("Secret:", envVars.JWT_ACCESS_SECRET);
-
-//     if (!token) {
-//       throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized");
-//     }
-
-//     try {
-//       const decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET);
-//       req.user = decoded;
-//       console.log("Decoded user:", decoded);
-
-//       // যদি role লাগে
-//       if (requiredRoles.length && !requiredRoles.includes((decoded as any).role)) {
-//         throw new AppError(httpStatus.FORBIDDEN, "Forbidden");
-//       }
-
-//       next();
-//     } catch (err) {
-//       throw new AppError(httpStatus.UNAUTHORIZED, "Invalid Token");
-//     }
-//   };
-// };
-
 
 import type { NextFunction, Request, Response } from "express"
 import jwt, { type JwtPayload } from "jsonwebtoken"
@@ -61,7 +25,6 @@ export const auth = (...requiredRoles: UserRole[]) => {
       // Verify token
       const decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET as string) as CustomJwtPayload
 
-      console.log("Decoded token:", decoded) // Debug log
 
       // Check if user exists
       const user = await User.findById(decoded.userId)

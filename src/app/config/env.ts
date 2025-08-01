@@ -16,7 +16,7 @@ const loadEnvVariables = (): EnvConfig => {
         throw new Error(`Missing required environment variable: ${envVar}`);
         }
   })
-  console.log(process.env.JWT_ACCESS_SECRET);
+ 
   return{
     PORT: process.env.PORT as string,
     DB_URL: process.env.DB_URL as string,
