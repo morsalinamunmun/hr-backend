@@ -23,7 +23,7 @@ export interface IParcel {
   type: string;
   weight: number;
   fee: number;
-  deliveryDate: Date;
+  deliveryDate: Date | string; // Can be a Date object or a string
   status: ParcelStatus;
   statusLogs: IStatusLog[];
   isBlocked?: boolean;
