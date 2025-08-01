@@ -2,11 +2,7 @@ import mongoose from "mongoose";
 
 import { Server } from "http";
 import app from "./app";
-import { promise } from "zod";
-import { hasUncaughtExceptionCaptureCallback } from "process";
 import { envVars } from "./app/config/env";
-
-const uri = "mongodb+srv://morsalinamunmun:glSVrWxooBKqO4b6@cluster0.ddlqajr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 let server: Server;
 
@@ -24,25 +20,25 @@ const startServer = async () => {
 }
 startServer();
 
-// process.on("unhandledRejection", (error) => {
-//   console.error("Unhandled Rejection:", error);
-//   if (server) {
-//     server.close(() => {
-//       process.exit(1);
-//     });
-//   } else {
-//     process.exit(1);
-//   }
-// }
-// );
+process.on("unhandledRejection", (error) => {
+  console.error("Unhandled Rejection:", error);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+}
+);
 
-// process.on("uncaughtException", (error) => {
-//   console.error("Uncaught Exception:", error);
-//   if (server) {
-//     server.close(() => {
-//       process.exit(1);
-//     });
-//   } else {
-//     process.exit(1);
-//   }
-// });
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+});
