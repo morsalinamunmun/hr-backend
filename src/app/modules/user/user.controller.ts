@@ -39,11 +39,36 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
     })
 })
 
-// function => try-catch catch => req-res function
+const blockUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserServices.blockUser(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User blocked successfully",
+    data: result,
+  });
+});
+
+const unblockUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserServices.unblockUser(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User unblocked successfully",
+    data: result,
+  });
+});
+
 
 export const UserControllers = {
     createUser,
-    getAllUsers
+    getAllUsers,
+    blockUser,
+    unblockUser
 }
 
 // route matching -> controller -> service -> model -> DB

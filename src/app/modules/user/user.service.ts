@@ -2,7 +2,8 @@
 import bcryptjs from "bcryptjs"
 import httpStatus from "http-status-codes"
 import { envVars } from "../../config/env"
-import type { IUser, IUserAuth } from "./user.interface"
+import type { IUser, IUserAuth, UserRole } from "./user.interface"
+import { UserStatus } from "./user.interface"
 import { User } from "./user.model"
 import AppError from "../../errorHelpers/AppError"
 
@@ -43,7 +44,39 @@ const getAllUsers = async () => {
   }
 }
 
+const blockUser = async (userId: string) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  if (user.role === "ADMIN" as UserRole) {
+    throw new AppError(httpStatus.FORBIDDEN, "Admin user cannot be blocked");
+  }
+
+  user.isActive = UserStatus.BLOCKED; // UserStatus.BLOCKED
+  await user.save();
+
+  return user;
+};
+
+const unblockUser = async (userId: string) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  user.isActive = UserStatus.ACTIVE; // UserStatus.ACTIVE
+  await user.save();
+
+  return user;
+};
+
 export const UserServices = {
   createUser,
-  getAllUsers
+  getAllUsers,
+  blockUser,
+  unblockUser
 }
