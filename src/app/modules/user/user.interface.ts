@@ -4,9 +4,6 @@ export enum UserRole {
     SUPER_ADMIN = "super_admin",
     USER = "user",              
     ADMIN = "admin",
-    SENDER = "sender",
-    RECEIVER = "receiver",
-    GUIDE = "guide",
 }
 
 export interface IUserAuth {

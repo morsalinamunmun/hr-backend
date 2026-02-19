@@ -12,7 +12,7 @@ app.use(express.json());
 app.use("/api/v1", router);
 
 app.get("/", (req:Request, res: Response) => {
-  res.status(200).json({message: "Welcome to the parcel server!"});
+  res.status(200).json({message: "Welcome to the HR Management server!"});
 });
 
 app.use(globalErrorHandler)
