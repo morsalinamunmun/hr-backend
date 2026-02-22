@@ -4,7 +4,7 @@ import bcryptjs from "bcryptjs";
 import httpStatus from "http-status-codes";
 import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import { IUser } from "../user/user.interface";
+import { IUser, UserStatus, UserVerified } from "../user/user.interface";
 import { User } from "../user/user.model";
 import { generateToken } from "../../utils/jwt";
 
@@ -23,6 +23,23 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     if (!isPasswordMatched) {
         throw new AppError(httpStatus.BAD_REQUEST, "Incorrect Password")
     }
+
+     //  Approval Check
+  if (isUserExist.isVerified !== UserVerified.APPROVED) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Your account is pending approval."
+    );
+  }
+
+  //  Active / Block Check
+  if (isUserExist.isActive !== UserStatus.ACTIVE) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Your account is blocked or inactive."
+    );
+  }
+
     const jwtPayload = {
         userId: isUserExist._id,
         email: isUserExist.email,

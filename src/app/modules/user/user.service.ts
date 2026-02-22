@@ -3,12 +3,12 @@ import bcryptjs from "bcryptjs"
 import httpStatus from "http-status-codes"
 import { envVars } from "../../config/env"
 import type { IUser, IUserAuth, UserRole } from "./user.interface"
-import { UserStatus } from "./user.interface"
+import { UserStatus, UserVerified } from "./user.interface"
 import { User } from "./user.model"
 import AppError from "../../errorHelpers/AppError"
 
 const createUser = async (payload: Partial<IUser>) => {
-  const { email, password, ...rest } = payload
+  const { email, password, role, ...rest } = payload
 
   const isUserExist = await User.findOne({ email })
   if (isUserExist) {
@@ -27,11 +27,23 @@ const createUser = async (payload: Partial<IUser>) => {
     email,
     password: hashedPassword,
     auth: [authProvider], // This was 'auths' before, should be 'auth'
+    role: role as UserRole,
+      isActive: UserStatus.ACTIVE,
+  isVerified: UserVerified.PENDING,  // Set default status to PENDING
     ...rest, // This includes the role from the request
   })
 
   return user
 }
+const verifyUser = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) throw new AppError(404, "User not found");
+
+   user.isVerified = UserVerified.APPROVED;
+  await user.save();
+
+  return user;
+}; 
 
 const getAllUsers = async () => {
   const users = await User.find({}).select("-password") // Exclude password from response
@@ -76,6 +88,7 @@ const unblockUser = async (userId: string) => {
 
 export const UserServices = {
   createUser,
+  verifyUser,
   getAllUsers,
   blockUser,
   unblockUser

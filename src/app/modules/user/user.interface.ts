@@ -11,9 +11,14 @@ export interface IUserAuth {
     providerId: string;
 }
 export enum UserStatus {
+      PENDING = "PENDING", 
     ACTIVE = "ACTIVE",  
     INACTIVE = "INACTIVE",
     BLOCKED = "BLOCKED",
+}
+export enum UserVerified {
+      PENDING = "PENDING", 
+   APPROVED= "APPROVED"
 }
 export interface IUser{
     _id: string;
@@ -29,5 +34,5 @@ export interface IUser{
     createdAt?: Date;
     updatedAt?: Date;
     isActive?: UserStatus;
-    isVerified?: boolean;
+    isVerified?: UserVerified;
 }

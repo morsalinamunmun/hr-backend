@@ -21,6 +21,17 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 
+const verifyUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await UserServices.verifyUser(id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User verified successfully",
+    data: result,
+  });
+});
 
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const result = await UserServices.getAllUsers();
@@ -66,6 +77,7 @@ const unblockUser = catchAsync(async (req: Request, res: Response) => {
 
 export const UserControllers = {
     createUser,
+    verifyUser,
     getAllUsers,
     blockUser,
     unblockUser
