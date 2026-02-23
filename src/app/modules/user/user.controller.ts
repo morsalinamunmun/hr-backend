@@ -52,7 +52,8 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
 
 const blockUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await UserServices.blockUser(id);
+  const loggedInUserRole = req.user.role;
+  const result = await UserServices.blockUser(id, loggedInUserRole);
 
   sendResponse(res, {
     success: true,

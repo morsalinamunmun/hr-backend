@@ -12,22 +12,6 @@ export const auth = (...roles: UserRole[]) => {
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized");
     }
-    const decoded = jwt.verify(token, envVars.JWT_ACCESS_SECRET) as JwtPayload;
-    req.user = decoded;
-    if (decoded.isVerified === "PENDING") {
-      throw new AppError(
-        httpStatus.FORBIDDEN,
-        "Your account is waiting for super admin approval.",
-      );
-    }
-
-    if (decoded.isActive === "BLOCKED") {
-      throw new AppError(httpStatus.FORBIDDEN, "Your account is blocked.");
-    }
-
-    if (decoded.isActive === "INACTIVE") {
-      throw new AppError(httpStatus.FORBIDDEN, "Your account is inactive.");
-    }
     try {
       const decoded = jwt.verify(
         token,
