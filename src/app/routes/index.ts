@@ -13,7 +13,7 @@ const modulesRoutes =[
     },
     { path: "/auth", route: AuthRoutes },
      { path: "/parcels", route: ParcelRoutes },
-     { path: "/attendance", route: AttendanceRoutes },
+     { path: "/attendance", route: AttendanceRoutes }
 ]
 
 modulesRoutes.forEach(route => router.use(route.path, route.route));
