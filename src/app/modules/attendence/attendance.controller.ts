@@ -18,7 +18,7 @@ export const AttendanceController = {
 
       const date = new Date().toISOString().split("T")[0];
 
-      let attendance = await Attendance.findOne({ user_id, date });
+      const attendance = await Attendance.findOne({ user_id, date });
 
       // 🟢 CHECK IN
       if (!attendance) {
