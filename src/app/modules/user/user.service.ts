@@ -56,6 +56,12 @@ const getAllUsers = async () => {
   }
 }
 
+// get single user
+const getUserById = async (id: string) => {
+  const user = await User.findById(id).select("-password");
+  return user;
+};
+
 const blockUser = async (userId: string, requesterRole: UserRole) => {
   const user = await User.findById(userId);
 
@@ -92,6 +98,7 @@ export const UserServices = {
   createUser,
   verifyUser,
   getAllUsers,
+  getUserById,
   blockUser,
   unblockUser
 }

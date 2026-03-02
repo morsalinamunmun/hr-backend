@@ -9,7 +9,6 @@ import { UserServices } from "./user.service";
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = await UserServices.createUser(req.body)
 
-
     // Remove password from the response
     const { password, ...userWithoutPassword } = user.toObject();
 
@@ -50,6 +49,19 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
     })
 })
 
+// single user
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user._id; // 🔥 token থেকে আসবে
+  const result = await UserServices.getUserById(userId);
+console.log("DB user:", result);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Logged in user retrieved successfully",
+    data: result,
+  });
+});
+
 const blockUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const loggedInUserRole = req.user.role;
@@ -80,6 +92,7 @@ export const UserControllers = {
     createUser,
     verifyUser,
     getAllUsers,
+    getMe,
     blockUser,
     unblockUser
 }

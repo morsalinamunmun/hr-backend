@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IUser, IUserAuth, UserRole, UserStatus, UserVerified } from "./user.interface";
+import { IUser, IUserAuth, UserRole, UserStatus, UserVerified, WorkType } from "./user.interface";
 
 const authProviderSchema = new Schema<IUserAuth>({
     provider: { type: String, required: true },
@@ -55,7 +55,13 @@ isVerified: {
     enum: Object.values(UserVerified),
     default: UserVerified.PENDING,
 },
-auth: [authProviderSchema]
+auth: [authProviderSchema],
+work_type: {
+      type: String,
+      enum: Object.values(WorkType),
+      required: true,
+      default: WorkType.OFFICE, // নতুন ইউজারের জন্য default
+    },
 },{
     timestamps: true,
     versionKey: false,

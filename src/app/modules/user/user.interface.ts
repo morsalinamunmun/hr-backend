@@ -20,6 +20,10 @@ export enum UserVerified {
       PENDING = "PENDING", 
    APPROVED= "APPROVED"
 }
+export enum WorkType {
+  FIELD = "field",
+  OFFICE = "office",
+}
 export interface IUser{
     _id: string;
     name: string;
@@ -35,4 +39,5 @@ export interface IUser{
     updatedAt?: Date;
     isActive?: UserStatus;
     isVerified?: UserVerified;
+    work_type: WorkType;
 }
