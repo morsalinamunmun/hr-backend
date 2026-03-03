@@ -5,16 +5,27 @@ import { IEmployee } from "./employee.interface";
 
 // Create Employee
 const createEmployee = async (payload: IEmployee) => {
-  const existing = await Employee.findOne({
-    $or: [
-      { email: payload.email },
-      { employee_id: payload.employee_id },
-    ],
+   // Email duplicate check আগে করো
+  const existingEmail = await Employee.findOne({
+    email: payload.email,
   });
 
-  if (existing) {
-    return { success: false, message: "Employee already exists" };
+  if (existingEmail) {
+    return { success: false, message: "Email already exists" };
   }
+   // Last employee বের করো
+  const lastEmployee = await Employee.findOne()
+    .sort({ createdAt: -1 })
+    .select("employee_id");
+
+  let newEmployeeId = "250063"; // default starting
+
+  if (lastEmployee?.employee_id) {
+    const lastIdNumber = parseInt(lastEmployee.employee_id);
+    newEmployeeId = String(lastIdNumber + 1);
+  }
+
+  payload.employee_id = newEmployeeId;
 
   const result = await Employee.create(payload);
 
@@ -25,7 +36,6 @@ const createEmployee = async (payload: IEmployee) => {
   };
 };
 
-// Get All Employees with Pagination
 // Get All Employees with Pagination
 const getAllEmployees = async (page = 1, limit = 10) => {
   const skip = (page - 1) * limit;
