@@ -4,6 +4,7 @@ import { AuthRoutes } from "../modules/auth/auth.routes";
 import { ParcelRoutes } from "../modules/parcel/parcel.route";
 import { AttendanceRoutes } from "../modules/attendence/attendance.route";
 import { EmployeeRoutes } from "../modules/employee/employee.route";
+import { LeaveRoutes } from "../modules/leave/leave.route";
 
 export const router = Router();
 
@@ -15,7 +16,8 @@ const modulesRoutes =[
     { path: "/auth", route: AuthRoutes },
      { path: "/parcels", route: ParcelRoutes },
      { path: "/attendance", route: AttendanceRoutes },
-     { path: "/employees", route: EmployeeRoutes }
+     { path: "/employees", route: EmployeeRoutes },
+     { path: "/leaves", route: LeaveRoutes }
 ]
 
 modulesRoutes.forEach(route => router.use(route.path, route.route));
