@@ -19,6 +19,11 @@ email: {
     required: true,
     unique: true,
 },
+employee_id: {
+    type: String,   
+    required: true,
+    unique: true,
+},
 password: {
     type: String,
     required: false,

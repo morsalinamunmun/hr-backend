@@ -1,7 +1,14 @@
 import { Leave } from "./leave.model";
 import { ILeave } from "./leave.interface";
+import { Types } from "mongoose";
 
-export const createLeaveService = async (payload: ILeave) => {
+// export const createLeaveService = async (payload: ILeave) => {
+//   return await Leave.create(payload);
+// };
+export const createLeaveService = async (payload: ILeave, userId: string) => {
+
+  payload.employee = new Types.ObjectId(userId);
+
   return await Leave.create(payload);
 };
 

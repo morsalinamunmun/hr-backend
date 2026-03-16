@@ -26,6 +26,7 @@ export enum WorkType {
 }
 export interface IUser{
     _id: string;
+    employee_id: string;
     name: string;
     email: string;
     password?: string;

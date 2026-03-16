@@ -7,6 +7,35 @@ import { UserStatus, UserVerified,UserRole } from "./user.interface"
 import { User } from "./user.model"
 import AppError from "../../errorHelpers/AppError"
 
+// const createUser = async (payload: Partial<IUser>) => {
+//   const { email, password, role, ...rest } = payload
+
+//   const isUserExist = await User.findOne({ email })
+//   if (isUserExist) {
+//     throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist")
+//   }
+
+//   const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND))
+
+//   const authProvider: IUserAuth = {
+//     provider: "credentials",
+//     providerId: email as string,
+//   }
+
+//   // Fixed: Changed 'auths' to 'auth' to match your schema
+//   const user = await User.create({
+//     email,
+//     password: hashedPassword,
+//     auth: [authProvider], // This was 'auths' before, should be 'auth'
+//     role: role as UserRole,
+//       isActive: UserStatus.ACTIVE,
+//   isVerified: UserVerified.PENDING,  // Set default status to PENDING
+//     ...rest, // This includes the role from the request
+//   })
+
+//   return user
+// }
+
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password, role, ...rest } = payload
 
@@ -15,22 +44,37 @@ const createUser = async (payload: Partial<IUser>) => {
     throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist")
   }
 
-  const hashedPassword = await bcryptjs.hash(password as string, Number(envVars.BCRYPT_SALT_ROUND))
+  // 🔹 Last employee id বের করো
+  const lastUser = await User.findOne()
+    .sort({ createdAt: -1 })
+    .select("employee_id")
+
+  let newEmployeeId = "250060" // default start
+
+  if (lastUser?.employee_id) {
+    const lastIdNumber = parseInt(lastUser.employee_id)
+    newEmployeeId = String(lastIdNumber + 1)
+  }
+
+  const hashedPassword = await bcryptjs.hash(
+    password as string,
+    Number(envVars.BCRYPT_SALT_ROUND)
+  )
 
   const authProvider: IUserAuth = {
     provider: "credentials",
     providerId: email as string,
   }
 
-  // Fixed: Changed 'auths' to 'auth' to match your schema
   const user = await User.create({
     email,
     password: hashedPassword,
-    auth: [authProvider], // This was 'auths' before, should be 'auth'
+    employee_id: newEmployeeId, // 🔥 auto generated
+    auth: [authProvider],
     role: role as UserRole,
-      isActive: UserStatus.ACTIVE,
-  isVerified: UserVerified.PENDING,  // Set default status to PENDING
-    ...rest, // This includes the role from the request
+    isActive: UserStatus.ACTIVE,
+    isVerified: UserVerified.PENDING,
+    ...rest,
   })
 
   return user

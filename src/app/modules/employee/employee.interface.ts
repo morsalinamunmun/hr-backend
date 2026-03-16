@@ -11,6 +11,7 @@ export interface IEmployee extends Document {
   mobile_number: string;
   designation: string;
   joining_date: Date;
+  leave: string;
   image?: string;
   address: string;
   nid: string;

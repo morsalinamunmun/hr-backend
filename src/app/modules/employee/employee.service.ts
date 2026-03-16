@@ -4,8 +4,40 @@ import { Employee } from "./employee.model";
 import { IEmployee } from "./employee.interface";
 
 // Create Employee
+// const createEmployee = async (payload: IEmployee) => {
+//    // Email duplicate check আগে করো
+//   const existingEmail = await Employee.findOne({
+//     email: payload.email,
+//   });
+
+//   if (existingEmail) {
+//     return { success: false, message: "Email already exists" };
+//   }
+//    // Last employee বের করো
+//   const lastEmployee = await Employee.findOne()
+//     .sort({ createdAt: -1 })
+//     .select("employee_id");
+
+//   let newEmployeeId = "250063"; // default starting
+
+//   if (lastEmployee?.employee_id) {
+//     const lastIdNumber = parseInt(lastEmployee.employee_id);
+//     newEmployeeId = String(lastIdNumber + 1);
+//   }
+
+//   payload.employee_id = newEmployeeId;
+
+//   const result = await Employee.create(payload);
+
+//   return {
+//     success: true,
+//     message: "Employee created successfully",
+//     data: result,
+//   };
+// };
+
 const createEmployee = async (payload: IEmployee) => {
-   // Email duplicate check আগে করো
+
   const existingEmail = await Employee.findOne({
     email: payload.email,
   });
@@ -13,19 +45,15 @@ const createEmployee = async (payload: IEmployee) => {
   if (existingEmail) {
     return { success: false, message: "Email already exists" };
   }
-   // Last employee বের করো
-  const lastEmployee = await Employee.findOne()
-    .sort({ createdAt: -1 })
-    .select("employee_id");
 
-  let newEmployeeId = "250063"; // default starting
+  // employee_id duplicate check
+  const existingEmployeeId = await Employee.findOne({
+    employee_id: payload.employee_id,
+  });
 
-  if (lastEmployee?.employee_id) {
-    const lastIdNumber = parseInt(lastEmployee.employee_id);
-    newEmployeeId = String(lastIdNumber + 1);
+  if (existingEmployeeId) {
+    return { success: false, message: "Employee ID already exists" };
   }
-
-  payload.employee_id = newEmployeeId;
 
   const result = await Employee.create(payload);
 

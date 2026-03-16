@@ -13,6 +13,7 @@ const employeeSchema = new Schema<IEmployee>(
     mobile_number: { type: String, required: true },
     designation: { type: String, required: true },
     joining_date: { type: Date, required: true },
+    leave: { type: String, required: true },
     image: { type: String },
     address: { type: String, required: true },
     nid: { type: String, required: true },
