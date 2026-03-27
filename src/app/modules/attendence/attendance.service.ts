@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Attendance } from "./attendance.model";
 
@@ -94,6 +95,76 @@ const getUserAttendance = async (userId: string) => {
   return records;
 };
 
+// get all attendance
+const getAllAttendance = async (query: any) => {
+  const { 
+    startDate, 
+    endDate, 
+    employee_id, 
+    page = 1, 
+    limit = 10 
+  } = query;
+
+  const match: any = {};
+
+  if (startDate && endDate) {
+    match.date = {
+      $gte: startDate,
+      $lte: endDate,
+    };
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const pipeline: any[] = [
+    { $match: match },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+
+    // employee_id filter এখানে apply হবে 🔥
+    ...(employee_id
+      ? [{ $match: { "user.employee_id": employee_id } }]
+      : []),
+
+    { $sort: { date: -1 } },
+
+    {
+      $facet: {
+        data: [
+          { $skip: skip },
+          { $limit: Number(limit) },
+        ],
+        total: [
+          { $count: "count" }
+        ],
+      },
+    },
+  ];
+
+  const result = await Attendance.aggregate(pipeline);
+
+  const data = result[0].data;
+  const total = result[0].total[0]?.count || 0;
+
+  return {
+    data,
+    meta: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPage: Math.ceil(total / limit),
+    },
+  };
+};
+
 // Get today's attendance for a user
 const getTodayAttendance = async (userId: string) => {
   const today = new Date().toISOString().split("T")[0];
@@ -134,6 +205,7 @@ const updateCheckOut = async (userId: string, payload: Partial<MarkAttendancePay
 export const AttendanceService = {
   markAttendance,
   getUserAttendance,
+  getAllAttendance,
   getTodayAttendance,
   updateCheckOut,
 };
