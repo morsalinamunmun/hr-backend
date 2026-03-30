@@ -53,7 +53,6 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
 const getMe = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user._id; // 🔥 token থেকে আসবে
   const result = await UserServices.getUserById(userId);
-console.log("DB user:", result);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

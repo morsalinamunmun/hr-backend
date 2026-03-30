@@ -4,10 +4,11 @@ import * as LeaveService from "./leave.service";
 
 // create leave
 export const createLeave = async (req: Request, res: Response) => {
-  const leave = await LeaveService.createLeaveService({
-    ...req.body,
-    employee: req.user.id,
-  });
+  const userId = req.user.id;
+  const leave = await LeaveService.createLeaveService(
+  req.body,
+    userId ,
+  );
 
   res.status(201).json({
     success: true,

@@ -1,10 +1,9 @@
 import { Router } from "express";
 import { UserRoutes } from "../modules/user/user.routes";
 import { AuthRoutes } from "../modules/auth/auth.routes";
-import { ParcelRoutes } from "../modules/parcel/parcel.route";
-import { AttendanceRoutes } from "../modules/attendence/attendance.route";
 import { EmployeeRoutes } from "../modules/employee/employee.route";
 import { LeaveRoutes } from "../modules/leave/leave.route";
+import { AttendanceRoutes } from "../modules/attendence/attendance.route";
 
 export const router = Router();
 
@@ -14,7 +13,6 @@ const modulesRoutes =[
         route: UserRoutes
     },
     { path: "/auth", route: AuthRoutes },
-     { path: "/parcels", route: ParcelRoutes },
      { path: "/attendance", route: AttendanceRoutes },
      { path: "/employees", route: EmployeeRoutes },
      { path: "/leaves", route: LeaveRoutes }

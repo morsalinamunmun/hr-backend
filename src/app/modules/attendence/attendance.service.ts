@@ -22,8 +22,6 @@ const markAttendance = async (payload: MarkAttendancePayload) => {
   // একই user, same date খুঁজে বের করা
   let attendance = await Attendance.findOne({ user_id, date: today });
 
-  console.log("Attendance found:", attendance); // Debugging
-
   if (type === "check-in") {
     // duplicate check-in block
     if (attendance?.check_in?.timestamp) {
