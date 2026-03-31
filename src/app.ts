@@ -27,26 +27,25 @@ const app = express();
 //   },
 //   credentials: true
 // }));
-app.use(cors({
-  origin: true, // 🔥 allow all dynamically
-  credentials: true
-}));
+// ata last c panel success cors issue solved
+// app.use(cors({
+//   origin: true, // 🔥 allow all dynamically
+//   credentials: true
+// }));
 // 🔥 MUST: manual OPTIONS handler
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(200);
+//   }
+//   next();
+// });
 // app.options("*", cors());
-// app.use(cors({origin: ['http://localhost:8080', 'https://parcel-stride.vercel.app']}));
+app.use(cors({origin: ['http://localhost:8080', 'https://hr.tramessy.com/']}));
 app.use(express.json());
 // app.use(cors())
 // app.options("*", cors());
 app.use("/api/v1", router);
-// app.get("/test", (req, res) => {
-//   res.json({ message: "Live server running latest code!" });
-// });
+
 app.get("/", (req:Request, res: Response) => {
   res.status(200).json({message: "Welcome to the HR Management server!"});
 });
