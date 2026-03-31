@@ -1,46 +1,67 @@
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
-// import { Server } from "http";
+// // import { Server } from "http";
+// import app from "./app";
+// import { envVars } from "./app/config/env";
+
+// // let server: Server;
+
+// const startServer = async () => {
+//   try {
+//     await mongoose.connect(envVars.DB_URL);
+//     console.log("Connected to MongoDB");
+    
+//     // server = app.listen(envVars.PORT, () => {
+//     //   console.log("Server is running on port 3000");
+//     // });
+//   } catch (error) {
+//     console.error("Error connecting to MongoDB:", error);
+//   }
+// }
+// startServer();
+
+// process.on("unhandledRejection", (error) => {
+//   console.error("Unhandled Rejection:", error);
+//   // if (server) {
+//   //   server.close(() => {
+//   //     process.exit(1);
+//   //   });
+//   // } else {
+//   //   process.exit(1);
+//   // }
+// }
+// );
+
+// process.on("uncaughtException", (error) => {
+//   console.error("Uncaught Exception:", error);
+//   // if (server) {
+//   //   server.close(() => {
+//   //     process.exit(1);
+//   //   });
+//   // } else {
+//   //   process.exit(1);
+//   // }
+// });
+
+// export default app;
+
+import serverless from "serverless-http";
 import app from "./app";
+import mongoose from "mongoose";
 import { envVars } from "./app/config/env";
 
-// let server: Server;
+let conn: typeof mongoose | null = null;
 
-const startServer = async () => {
-  try {
-    await mongoose.connect(envVars.DB_URL);
-    console.log("Connected to MongoDB");
-    
-    // server = app.listen(envVars.PORT, () => {
-    //   console.log("Server is running on port 3000");
-    // });
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+const connectDB = async () => {
+  if (!conn) {
+    conn = await mongoose.connect(envVars.DB_URL);
+    console.log("MongoDB connected");
   }
-}
-startServer();
+};
 
-process.on("unhandledRejection", (error) => {
-  console.error("Unhandled Rejection:", error);
-  // if (server) {
-  //   server.close(() => {
-  //     process.exit(1);
-  //   });
-  // } else {
-  //   process.exit(1);
-  // }
-}
-);
+const handler = async (req: any, res: any) => {
+  await connectDB(); // ensure DB connection
+  return app(req, res);
+};
 
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
-  // if (server) {
-  //   server.close(() => {
-  //     process.exit(1);
-  //   });
-  // } else {
-  //   process.exit(1);
-  // }
-});
-
-export default app;
+export default serverless(handler);
