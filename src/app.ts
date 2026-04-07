@@ -28,22 +28,21 @@ const app = express();
 //   credentials: true
 // }));
 // ata last c panel success cors issue solved
-// app.use(cors({
-//   origin: true, // 🔥 allow all dynamically
-//   credentials: true
-// }));
-// 🔥 MUST: manual OPTIONS handler
-// app.use((req, res, next) => {
-//   if (req.method === "OPTIONS") {
-//     return res.sendStatus(200);
-//   }
-//   next();
-// });
+app.use(cors({
+  origin: true, // 🔥 allow all dynamically
+  credentials: true
+}));
+//  MUST: manual OPTIONS handler
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 // app.options("*", cors());
-app.use(cors({origin: ['http://localhost:8080', 'https://hr.tramessy.com/']}));
+// app.use(cors({origin: ['http://localhost:8080', 'https://hr.tramessy.com/']}));
 app.use(express.json());
 // app.use(cors())
-// app.options("*", cors());
 app.use("/api/v1", router);
 
 app.get("/", (req:Request, res: Response) => {
