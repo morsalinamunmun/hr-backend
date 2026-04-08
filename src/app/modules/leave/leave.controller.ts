@@ -25,11 +25,23 @@ export const getLeaves = async (req: any, res: Response) => {
   res.json(leaves);
 };
 
-export const updateLeave = async (req: Request, res: Response) => {
+// export const updateLeave = async (req: Request, res: Response) => {
+//   const leave = await LeaveService.updateLeaveService(
+//     req.params.id,
+//     req.body
+//   );
+//   res.json(leave);
+// };
+
+export const updateLeave = async (req: any, res: Response) => {
   const leave = await LeaveService.updateLeaveService(
     req.params.id,
-    req.body
+    req.body,
+    req.user.id,
+    req.user.role,
+    req.user.name
   );
+
   res.json(leave);
 };
 
