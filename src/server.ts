@@ -10,9 +10,9 @@ const startServer = async () => {
   try {
     await mongoose.connect(envVars.DB_URL);
     console.log("Connected to MongoDB");
-    
-    server = app.listen(envVars.PORT, () => {
-      console.log("Server is running on port 3000");
+    const PORT = envVars.PORT || "3000";
+    server = app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
@@ -43,4 +43,3 @@ process.on("uncaughtException", (error) => {
   }
 });
 
-// export default app;
