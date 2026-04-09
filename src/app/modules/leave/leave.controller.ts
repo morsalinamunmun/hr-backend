@@ -45,7 +45,12 @@ export const updateLeave = async (req: any, res: Response) => {
   res.json(leave);
 };
 
-export const deleteLeave = async (req: Request, res: Response) => {
-  await LeaveService.deleteLeaveService(req.params.id);
+export const deleteLeave = async (req: any, res: Response) => {
+  await LeaveService.deleteLeaveService(
+    req.params.id,
+    req.user.id,
+    req.user.role
+  );
+
   res.json({ message: "Leave deleted" });
 };
