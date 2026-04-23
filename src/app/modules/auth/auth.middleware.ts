@@ -17,7 +17,12 @@ export const auth = (...roles: UserRole[]) => {
         token,
         envVars.JWT_ACCESS_SECRET,
       ) as JwtPayload;
-      req.user = decoded;
+      // req.user = decoded;
+       req.user = {
+        userId: decoded._id,
+        email: decoded.email,
+        role: decoded.role,
+      };
 
       if (roles.length && !roles.includes(decoded.role)) {
         throw new AppError(httpStatus.FORBIDDEN, "Forbidden: Access denied");

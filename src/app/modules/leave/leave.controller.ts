@@ -4,7 +4,7 @@ import * as LeaveService from "./leave.service";
 
 // create leave
 export const createLeave = async (req: Request, res: Response) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const leave = await LeaveService.createLeaveService(
   req.body,
     userId ,
@@ -16,28 +16,72 @@ export const createLeave = async (req: Request, res: Response) => {
   });
 };
 
+// export const getLeaves = async (req: any, res: Response) => {
+//   const userId = req.user.userId;
+
+//   const result = await LeaveService.getLeavesService(
+//     userId,  
+//   );
+
+//   return res.json({
+//     success: true,
+//     data: result,
+//   });
+// };
+
+// USER LEAVES (own)
 export const getLeaves = async (req: any, res: Response) => {
-  const userId = req.user.id;
-  const role = req.user.role;
+  const userId = req.user.userId;
 
-  const leaves = await LeaveService.getLeavesService(userId, role);
+  const { page = 1, limit = 10, fromDate, toDate } = req.query;
 
-  res.json(leaves);
+  const result = await LeaveService.getLeavesService(
+    userId,
+    Number(page),
+    Number(limit),
+    fromDate,
+    toDate
+  );
+
+  return res.json({
+    success: true,
+    data: result.data,
+    pagination: result.pagination,
+  });
 };
 
-// export const updateLeave = async (req: Request, res: Response) => {
-//   const leave = await LeaveService.updateLeaveService(
-//     req.params.id,
-//     req.body
-//   );
-//   res.json(leave);
+// ADMIN REPORT (all)
+// export const getAllLeaves = async (req: any, res: Response) => {
+//   const leaves = await LeaveService.getAllLeavesService();
+
+//   return res.json({
+//     success: true,
+//     data: leaves,
+//   });
 // };
+
+export const getAllLeaves = async (req: any, res: Response) => {
+  const { page = 1, limit = 10, fromDate, toDate } = req.query;
+
+  const result = await LeaveService.getAllLeavesService(
+    Number(page),
+    Number(limit),
+    fromDate,
+    toDate
+  );
+
+  return res.json({
+    success: true,
+    data: result.data,
+    pagination: result.pagination,
+  });
+};
 
 export const updateLeave = async (req: any, res: Response) => {
   const leave = await LeaveService.updateLeaveService(
     req.params.id,
     req.body,
-    req.user.id,
+    req.user.userId,
     req.user.role,
     req.user.name
   );
@@ -48,7 +92,7 @@ export const updateLeave = async (req: any, res: Response) => {
 export const deleteLeave = async (req: any, res: Response) => {
   await LeaveService.deleteLeaveService(
     req.params.id,
-    req.user.id,
+    req.user.userId,
     req.user.role
   );
 

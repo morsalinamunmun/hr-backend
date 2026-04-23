@@ -14,6 +14,11 @@ const employeeSchema = new Schema<IEmployee>(
     designation: { type: String, required: true },
     joining_date: { type: Date, required: true },
     leave: { type: String, required: true },
+     basic_salary: { 
+      type: Number, 
+      required: true, 
+      min: 0 
+    },
     image: { type: String },
     address: { type: String, required: true },
     nid: { type: String, required: true },

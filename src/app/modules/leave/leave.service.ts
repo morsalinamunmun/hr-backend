@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Leave } from "./leave.model";
 import { ILeave } from "./leave.interface";
 import { Types } from "mongoose";
@@ -12,23 +13,86 @@ export const createLeaveService = async (payload: ILeave, userId: string) => {
   return await Leave.create(payload);
 };
 
+// export const getLeavesService = async (userId: string) => {
+//   return await Leave.find({ employee: userId }).sort({ createdAt: -1 });
+// };
 export const getLeavesService = async (
   userId: string,
-  role: string
+  page: number,
+  limit: number,
+  fromDate?: string,
+  toDate?: string
 ) => {
-  if (role === "admin" || role === "super_admin") {
-    return await Leave.find().sort({ createdAt: -1 });
+  const query: any = { employee: userId };
+
+  // Date filter
+  if (fromDate && toDate) {
+    query.fromDate = {
+      $gte: new Date(fromDate),
+      $lte: new Date(toDate),
+    };
   }
 
-  return await Leave.find({ employee: userId }).sort({ createdAt: -1 });
+  const skip = (page - 1) * limit;
+
+  const data = await Leave.find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Leave.countDocuments(query);
+
+  return {
+    data,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
-// export const updateLeaveService = async (
-//   id: string,
-//   payload: Partial<ILeave>
-// ) => {
-//   return await Leave.findByIdAndUpdate(id, payload, { new: true });
+// export const getAllLeavesService = async () => {
+//   return await Leave.find().sort({ createdAt: -1 });
 // };
+
+
+export const getAllLeavesService = async (
+  page = 1,
+  limit = 10,
+  fromDate?: string,
+  toDate?: string
+) => {
+  const query: any = {};
+
+  if (fromDate && toDate) {
+    query.fromDate = {
+      $gte: new Date(fromDate),
+      $lte: new Date(toDate),
+    };
+  }
+
+  const skip = (page - 1) * limit;
+
+  const data = await Leave.find(query)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Leave.countDocuments(query);
+
+  return {
+    data,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
 export const updateLeaveService = async (
   id: string,
   payload: Partial<ILeave>,
@@ -69,10 +133,6 @@ export const updateLeaveService = async (
 
   return await Leave.findByIdAndUpdate(id, payload, { new: true });
 };
-
-// export const deleteLeaveService = async (id: string) => {
-//   return await Leave.findByIdAndDelete(id);
-// };
 
 export const deleteLeaveService = async (
   id: string,

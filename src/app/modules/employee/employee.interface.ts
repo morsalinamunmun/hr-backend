@@ -14,6 +14,7 @@ export interface IEmployee extends Document {
   leave: string;
   image?: string;
   address: string;
+  basic_salary: number;
   nid: string;
   gender: "Male" | "Female" | "Other";
   blood_group: string;

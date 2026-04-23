@@ -16,7 +16,7 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
         success: true,
         statusCode: httpStatus.CREATED,
         message: "User Created Successfully",
-        data: user,
+        data: userWithoutPassword,
     })
 })
 
@@ -42,7 +42,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
     // })
     sendResponse(res, {
         success: true,
-        statusCode: httpStatus.CREATED,
+        statusCode: httpStatus.OK,
         message: "All Users Retrieved Successfully",
         data: result.data,
         meta: result.meta
@@ -51,7 +51,8 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
 
 // single user
 const getMe = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user._id; // 🔥 token থেকে আসবে
+  // console.log(req.user, "REQ USER");
+  const userId = req.user.userId; //  token থেকে আসবে
   const result = await UserServices.getUserById(userId);
   sendResponse(res, {
     success: true,

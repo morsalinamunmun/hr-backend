@@ -11,7 +11,7 @@ const router = Router()
 router.get("/users", UserControllers.getAllUsers) 
 // /api/v1/user/:id
 router.get("/me", auth(), UserControllers.getMe);
-router.patch("/verify/:id", auth(UserRole.SUPER_ADMIN), UserControllers.verifyUser);
+router.patch("/verify/:id", auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), UserControllers.verifyUser);
 // Block / Unblock routes (only admin access ideally)
 router.patch("/block/:id",  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), UserControllers.blockUser);
 router.patch("/unblock/:id",  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), UserControllers.unblockUser);
