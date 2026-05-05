@@ -8,8 +8,22 @@ const createBonus = async (req: Request, res: Response) => {
 };
 
 // GET ALL
- const getAllBonus = async (req: Request, res: Response) => {
-  const result = await BonusService.getAllBonus();
+//  const getAllBonus = async (req: Request, res: Response) => {
+//   const result = await BonusService.getAllBonus();
+//   res.json(result);
+// };
+
+const getAllBonus = async (req: Request, res: Response) => {
+  const { page, limit, search, fromDate, toDate } = req.query;
+
+  const result = await BonusService.getAllBonus({
+    page: Number(page) || 1,
+    limit: Number(limit) || 10,
+    search: search as string,
+    fromDate: fromDate as string,
+    toDate: toDate as string,
+  });
+
   res.json(result);
 };
 
