@@ -94,28 +94,203 @@ const getUserAttendance = async (userId: string) => {
 };
 
 // get all attendance
+// const getAllAttendance = async (query: any) => {
+//   const { 
+//     startDate, 
+//     endDate, 
+//     employee_id, 
+//     page = 1, 
+//     limit = 10 
+//   } = query;
+
+//   const match: any = {};
+
+//   if (startDate && endDate) {
+//     match.date = {
+//       $gte: startDate,
+//       $lte: endDate,
+//     };
+//   }
+
+//   const skip = (Number(page) - 1) * Number(limit);
+
+//   const pipeline: any[] = [
+//     { $match: match },
+
+//     {
+//       $lookup: {
+//         from: "users",
+//         localField: "user_id",
+//         foreignField: "_id",
+//         as: "user",
+//       },
+//     },
+//     { $unwind: "$user" },
+
+//     // employee_id filter এখানে apply হবে 🔥
+//     ...(employee_id
+//       ? [{ $match: { "user.employee_id": employee_id } }]
+//       : []),
+
+//     { $sort: { date: -1 } },
+
+//     {
+//       $facet: {
+//         data: [
+//           { $skip: skip },
+//           { $limit: Number(limit) },
+//         ],
+//         total: [
+//           { $count: "count" }
+//         ],
+//       },
+//     },
+//   ];
+
+//   const result = await Attendance.aggregate(pipeline);
+
+//   const data = result[0].data;
+//   const total = result[0].total[0]?.count || 0;
+
+//   return {
+//     data,
+//     meta: {
+//       total,
+//       page: Number(page),
+//       limit: Number(limit),
+//       totalPage: Math.ceil(total / limit),
+//     },
+//   };
+// };
+
+// get all attendance
+// const getAllAttendance = async (query: any) => {
+//   const {
+//     startDate,
+//     endDate,
+//     employee_id,
+//     search,        // 🔥 নতুন: employee name search
+//     page = 1,
+//     limit = 10,
+//   } = query;
+
+//   const match: any = {};
+
+//   if (startDate && endDate) {
+//     match.date = {
+//       $gte: startDate,
+//       $lte: endDate,
+//     };
+//   }
+
+//   const skip = (Number(page) - 1) * Number(limit);
+
+//   const pipeline: any[] = [
+//     { $match: match },
+
+//     {
+//       $lookup: {
+//         from: "users",
+//         localField: "user_id",
+//         foreignField: "_id",
+//         as: "user",
+//       },
+//     },
+//     { $unwind: "$user" },
+
+//     // employee_id filter
+//     ...(employee_id
+//       ? [{ $match: { "user.employee_id": employee_id } }]
+//       : []),
+
+//     // 🔥 search by employee name (case-insensitive)
+//     ...(search
+//       ? [
+//           {
+//             $match: {
+//               "user.name": { $regex: search, $options: "i" },
+//             },
+//           },
+//         ]
+//       : []),
+
+//     { $sort: { date: -1 } },
+
+//     {
+//       $facet: {
+//         data: [{ $skip: skip }, { $limit: Number(limit) }],
+//         total: [{ $count: "count" }],
+//       },
+//     },
+//   ];
+
+//   const result = await Attendance.aggregate(pipeline);
+// console.log(result);
+//   const data = result[0].data;
+//   const total = result[0].total[0]?.count || 0;
+
+//   return {
+//     data,
+//     meta: {
+//       total,
+//       page: Number(page),
+//       limit: Number(limit),
+//       totalPage: Math.ceil(total / limit),
+//     },
+//   };
+// };
+
 const getAllAttendance = async (query: any) => {
-  const { 
-    startDate, 
-    endDate, 
-    employee_id, 
-    page = 1, 
-    limit = 10 
+  const {
+    startDate,
+    endDate,
+    employee_id,
+    search,
+    page = 1,
+    limit = 10,
   } = query;
 
-  const match: any = {};
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const attendanceMatch: any = {};
 
   if (startDate && endDate) {
-    match.date = {
+    attendanceMatch.date = {
       $gte: startDate,
       $lte: endDate,
     };
   }
 
-  const skip = (Number(page) - 1) * Number(limit);
+  const userMatch: any = {};
+
+  if (employee_id?.trim()) {
+    userMatch["user.employee_id"] = {
+      $regex: employee_id.trim(),
+      $options: "i",
+    };
+  }
+
+  if (search?.trim()) {
+    userMatch.$or = [
+      {
+        "user.name": {
+          $regex: search.trim(),
+          $options: "i",
+        },
+      },
+      {
+        "user.employee_id": {
+          $regex: search.trim(),
+          $options: "i",
+        },
+      },
+    ];
+  }
 
   const pipeline: any[] = [
-    { $match: match },
+    {
+      $match: attendanceMatch,
+    },
 
     {
       $lookup: {
@@ -125,23 +300,39 @@ const getAllAttendance = async (query: any) => {
         as: "user",
       },
     },
-    { $unwind: "$user" },
 
-    // employee_id filter এখানে apply হবে 🔥
-    ...(employee_id
-      ? [{ $match: { "user.employee_id": employee_id } }]
+    {
+      $unwind: "$user",
+    },
+
+    ...(Object.keys(userMatch).length
+      ? [
+          {
+            $match: userMatch,
+          },
+        ]
       : []),
 
-    { $sort: { date: -1 } },
+    {
+      $sort: {
+        date: -1,
+      },
+    },
 
     {
       $facet: {
         data: [
-          { $skip: skip },
-          { $limit: Number(limit) },
+          {
+            $skip: skip,
+          },
+          {
+            $limit: Number(limit),
+          },
         ],
         total: [
-          { $count: "count" }
+          {
+            $count: "count",
+          },
         ],
       },
     },
@@ -149,8 +340,8 @@ const getAllAttendance = async (query: any) => {
 
   const result = await Attendance.aggregate(pipeline);
 
-  const data = result[0].data;
-  const total = result[0].total[0]?.count || 0;
+  const data = result[0]?.data ?? [];
+  const total = result[0]?.total?.[0]?.count ?? 0;
 
   return {
     data,
@@ -158,7 +349,7 @@ const getAllAttendance = async (query: any) => {
       total,
       page: Number(page),
       limit: Number(limit),
-      totalPage: Math.ceil(total / limit),
+      totalPage: Math.ceil(total / Number(limit)),
     },
   };
 };

@@ -28,9 +28,18 @@ const app = express();
 //   credentials: true
 // }));
 // ata last c panel success cors issue solved
+// app.use(cors({
+//   origin: true, // 🔥 allow all dynamically
+//   credentials: true
+// }));
 app.use(cors({
-  origin: true, // 🔥 allow all dynamically
-  credentials: true
+  origin: [
+    "http://localhost:8080",
+    "https://hr.tramessy.com"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 //  MUST: manual OPTIONS handler
 app.use((req, res, next) => {

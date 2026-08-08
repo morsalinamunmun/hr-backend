@@ -6,6 +6,7 @@ import { LeaveRoutes } from "../modules/leave/leave.route";
 import { AttendanceRoutes } from "../modules/attendence/attendance.route";
 import { BonusRoutes } from "../modules/bonus/bonus.route";
 import { TaskRoutes } from "../modules/task/task.route";
+import { RequisitionRoutes } from "../modules/requisition/requisition.route";
 
 export const router = Router();
 
@@ -19,7 +20,11 @@ const modulesRoutes =[
      { path: "/employees", route: EmployeeRoutes },
      { path: "/leaves", route: LeaveRoutes },
      {path: "/bonus", route: BonusRoutes},
-     {path: "/tasks", route: TaskRoutes}
+     {path: "/tasks", route: TaskRoutes},
+     {
+    path: "/requisitions",
+    route: RequisitionRoutes,
+  },
 ]
 
 modulesRoutes.forEach(route => router.use(route.path, route.route));
