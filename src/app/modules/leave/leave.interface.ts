@@ -7,7 +7,7 @@ export interface ILeave {
   employeeId: string;
   designation: string;
   branchName: string;
-
+attachment?: string;
   leaveType: string;
   fromDate: Date;
   toDate: Date;

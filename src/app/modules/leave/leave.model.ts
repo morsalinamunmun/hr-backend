@@ -20,7 +20,7 @@ const leaveSchema = new Schema<ILeave>(
     mobileNo: { type: String, required: true },
 
     rejoinDate: { type: Date, required: true },
-
+attachment: { type: String, default: null, },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

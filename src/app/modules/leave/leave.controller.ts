@@ -3,17 +3,48 @@ import { Request, Response } from "express";
 import * as LeaveService from "./leave.service";
 
 // create leave
-export const createLeave = async (req: Request, res: Response) => {
-  const userId = req.user.userId;
-  const leave = await LeaveService.createLeaveService(
-  req.body,
-    userId ,
-  );
+// export const createLeave = async (req: Request, res: Response) => {
+//   const userId = req.user.userId;
+//   const leave = await LeaveService.createLeaveService(
+//   req.body,
+//     userId ,
+//   );
 
-  res.status(201).json({
-    success: true,
-    data: leave,
-  });
+//   res.status(201).json({
+//     success: true,
+//     data: leave,
+//   });
+// };
+
+export const createLeave = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.user.userId;
+
+    const payload = {
+      ...req.body,
+      attachment: req.file
+        ? `/uploads/leaves/${req.file.filename}`
+        : undefined,
+    };
+
+    const leave = await LeaveService.createLeaveService(
+      payload,
+      userId
+    );
+
+    return res.status(201).json({
+      success: true,
+      data: leave,
+    });
+  } catch (error: any) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 // export const getLeaves = async (req: any, res: Response) => {
@@ -89,11 +120,40 @@ export const getAllLeaves = async (req: any, res: Response) => {
 //   res.json(leave);
 // };
 
+// export const updateLeave = async (req: any, res: Response) => {
+//   try {
+//     const leave = await LeaveService.updateLeaveService(
+//       req.params.id,
+//       req.body,
+//       req.user.userId,
+//       req.user.role,
+//       req.user.name
+//     );
+
+//     res.json({
+//       success: true,
+//       data: leave,
+//     });
+//   } catch (error: any) {
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
 export const updateLeave = async (req: any, res: Response) => {
   try {
+    const payload = {
+      ...req.body,
+      ...(req.file && {
+        attachment: `/uploads/leaves/${req.file.filename}`,
+      }),
+    };
+
     const leave = await LeaveService.updateLeaveService(
       req.params.id,
-      req.body,
+      payload,
       req.user.userId,
       req.user.role,
       req.user.name
