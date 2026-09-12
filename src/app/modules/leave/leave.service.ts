@@ -119,9 +119,14 @@ export const updateLeaveService = async (
     }
 
     //  user status change করতে পারবে না
-    if (payload.status) {
-      throw new Error("You cannot change leave status");
+    if (role === "admin" || role === "super_admin") {
+    if (
+      payload.status === "approved" ||
+      payload.status === "rejected"
+    ) {
+      payload.approvedBy = userName;
     }
+  }
   }
 
   //  ADMIN / SUPER ADMIN RULE

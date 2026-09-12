@@ -3,8 +3,14 @@ import cors from "cors";
 import { router } from "./app/routes";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import notFound from "./app/middleware/NotFound";
+import path from "path";
 
 const app = express();
+
+app.use(
+  "/uploads",
+  express.static(path.join(process.cwd(), "uploads"))
+);
 
 // app.use(cors({
 //   origin: ["http://localhost:8080", "https://hr.tramessy.com/"], 
