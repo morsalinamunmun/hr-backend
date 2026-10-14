@@ -36,49 +36,104 @@ import AppError from "../../errorHelpers/AppError"
 //   return user
 // }
 
+// const createUser = async (payload: Partial<IUser>) => {
+//   const { email, password, role, ...rest } = payload
+
+//   const isUserExist = await User.findOne({ email })
+//   if (isUserExist) {
+//     throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist")
+//   }
+
+//   // 🔹 Last employee id বের করো
+//   const lastUser = await User.findOne()
+//     .sort({ createdAt: -1 })
+//     .select("employee_id")
+
+//   let newEmployeeId = "250060" // default start
+
+//   if (lastUser?.employee_id) {
+//     const lastIdNumber = parseInt(lastUser.employee_id)
+//     newEmployeeId = String(lastIdNumber + 1)
+//   }
+
+//   const hashedPassword = await bcryptjs.hash(
+//     password as string,
+//     Number(envVars.BCRYPT_SALT_ROUND)
+//   )
+
+//   const authProvider: IUserAuth = {
+//     provider: "credentials",
+//     providerId: email as string,
+//   }
+
+//   const user = await User.create({
+//     email,
+//     password: hashedPassword,
+//     employee_id: newEmployeeId, // 🔥 auto generated
+//     auth: [authProvider],
+//     role: role as UserRole,
+//     isActive: UserStatus.ACTIVE,
+//     isVerified: UserVerified.PENDING,
+//     ...rest,
+//   })
+
+//   return user
+// }
+
+
 const createUser = async (payload: Partial<IUser>) => {
-  const { email, password, role, ...rest } = payload
+  const { email, password, role, ...rest } = payload;
 
-  const isUserExist = await User.findOne({ email })
+  // Check duplicate email
+  const isUserExist = await User.findOne({ email });
+
   if (isUserExist) {
-    throw new AppError(httpStatus.BAD_REQUEST, "User Already Exist")
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User Already Exist"
+    );
   }
 
-  // 🔹 Last employee id বের করো
-  const lastUser = await User.findOne()
-    .sort({ createdAt: -1 })
+  // Find the highest existing employee ID
+  const lastUser = await User.findOne({
+    employee_id: { $regex: /^\d+$/ },
+  })
+    .sort({ employee_id: -1 })
     .select("employee_id")
+    .lean();
 
-  let newEmployeeId = "250060" // default start
+  // Start from 250060 if no employee exists
+  const lastIdNumber = lastUser?.employee_id
+    ? Number(lastUser.employee_id)
+    : 250059;
 
-  if (lastUser?.employee_id) {
-    const lastIdNumber = parseInt(lastUser.employee_id)
-    newEmployeeId = String(lastIdNumber + 1)
-  }
+  const newEmployeeId = String(lastIdNumber + 1);
 
+  // Hash password
   const hashedPassword = await bcryptjs.hash(
     password as string,
     Number(envVars.BCRYPT_SALT_ROUND)
-  )
+  );
 
   const authProvider: IUserAuth = {
     provider: "credentials",
     providerId: email as string,
-  }
+  };
 
   const user = await User.create({
+    ...rest,
     email,
     password: hashedPassword,
-    employee_id: newEmployeeId, // 🔥 auto generated
+    employee_id: newEmployeeId,
     auth: [authProvider],
     role: role as UserRole,
     isActive: UserStatus.ACTIVE,
     isVerified: UserVerified.PENDING,
-    ...rest,
-  })
+  });
 
-  return user
-}
+  return user;
+};
+
 const verifyUser = async (id: string) => {
   const user = await User.findById(id);
   if (!user) throw new AppError(404, "User not found");

@@ -93,6 +93,55 @@ export const getAllLeavesService = async (
   };
 };
 
+// export const updateLeaveService = async (
+//   id: string,
+//   payload: Partial<ILeave>,
+//   userId: string,
+//   role: string,
+//   userName: string
+// ) => {
+//   const leave = await Leave.findById(id);
+
+//   if (!leave) {
+//     throw new Error("Leave not found");
+//   }
+
+//   //  USER RULE
+//   if (role === "user") {
+//     //  অন্য কারো leave update করতে পারবে না
+//     if (leave.employee.toString() !== userId) {
+//       throw new Error("Not authorized");
+//     }
+
+//     //  approved/rejected হলে update করা যাবে না
+//     if (leave.status !== "pending") {
+//       throw new Error("Cannot edit approved/rejected leave");
+//     }
+
+//     //  user status change করতে পারবে না
+//     if (role === "admin" || role === "super_admin") {
+//     if (
+//       payload.status === "approved" ||
+//       payload.status === "rejected"
+//     ) {
+//       payload.approvedBy = userName;
+//     }
+//   }
+//   }
+
+//   //  ADMIN / SUPER ADMIN RULE
+//   if (role === "admin" || role === "super_admin") {
+//     if (payload.status === "approved" || payload.status === "rejected") {
+//       payload.approvedBy = userName;
+//     }
+//   }
+
+//   return await Leave.findByIdAndUpdate(id, payload, { new: true });
+// };
+
+
+
+
 export const updateLeaveService = async (
   id: string,
   payload: Partial<ILeave>,
@@ -106,20 +155,32 @@ export const updateLeaveService = async (
     throw new Error("Leave not found");
   }
 
-  //  USER RULE
+  // USER RULE
   if (role === "user") {
-    //  অন্য কারো leave update করতে পারবে না
+    // User can update only their own leave
     if (leave.employee.toString() !== userId) {
       throw new Error("Not authorized");
     }
 
-    //  approved/rejected হলে update করা যাবে না
+    // User can edit only pending leave
     if (leave.status !== "pending") {
       throw new Error("Cannot edit approved/rejected leave");
     }
 
-    //  user status change করতে পারবে না
-    if (role === "admin" || role === "super_admin") {
+    // User cannot approve or reject leave
+    if (
+      payload.status === "approved" ||
+      payload.status === "rejected"
+    ) {
+      throw new Error("User cannot approve or reject leave");
+    }
+
+    // Prevent user from changing approval information
+    delete payload.approvedBy;
+  }
+
+  // ADMIN / SUPER ADMIN RULE
+  if (role === "admin" || role === "super_admin") {
     if (
       payload.status === "approved" ||
       payload.status === "rejected"
@@ -127,16 +188,11 @@ export const updateLeaveService = async (
       payload.approvedBy = userName;
     }
   }
-  }
 
-  //  ADMIN / SUPER ADMIN RULE
-  if (role === "admin" || role === "super_admin") {
-    if (payload.status === "approved" || payload.status === "rejected") {
-      payload.approvedBy = userName;
-    }
-  }
-
-  return await Leave.findByIdAndUpdate(id, payload, { new: true });
+  return await Leave.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
 };
 
 export const deleteLeaveService = async (
