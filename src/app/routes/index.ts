@@ -7,6 +7,9 @@ import { AttendanceRoutes } from "../modules/attendence/attendance.route";
 import { BonusRoutes } from "../modules/bonus/bonus.route";
 import { TaskRoutes } from "../modules/task/task.route";
 import { RequisitionRoutes } from "../modules/requisition/requisition.route";
+import { HolidayRoutes } from "../modules/holiday/holiday.route";
+import { AdvanceSalaryRoutes } from "../modules/advanceSalary/advanceSalary.route";
+import { LunchRoutes } from "../modules/lunch/lunch.route";
 
 export const router = Router();
 
@@ -25,6 +28,9 @@ const modulesRoutes =[
     path: "/requisitions",
     route: RequisitionRoutes,
   },
+  { path: "/holidays", route: HolidayRoutes },
+  { path: "/advance-salary", route: AdvanceSalaryRoutes },
+  { path: "/lunch", route: LunchRoutes },
 ]
 
 modulesRoutes.forEach(route => router.use(route.path, route.route));

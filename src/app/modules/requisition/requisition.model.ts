@@ -1,26 +1,39 @@
 import { Schema, model } from "mongoose";
-import { IRequisition } from "./requisition.interface";
+import {
+  IRequisition,
+  RequisitionStatus,
+} from "./requisition.interface";
 
 const ItemSchema = new Schema(
   {
+    slNo: Number,
+
     itemName: {
       type: String,
-      required: true,
+      required: [true, "Item name is required"],
+      trim: true,
     },
 
     quantity: {
       type: Number,
-      required: true,
+      required: [true, "Quantity is required"],
+      min: [0, "Quantity cannot be negative"],
+    },
+
+    unit: {
+      type: String,
+      trim: true,
     },
 
     unitPrice: {
       type: Number,
-      required: true,
+      required: [true, "Unit price is required"],
+      min: [0, "Unit price cannot be negative"],
     },
 
     totalPrice: {
       type: Number,
-      required: true,
+      default: 0,
     },
 
     remarks: String,
@@ -32,14 +45,16 @@ const ItemSchema = new Schema(
 
 const ApprovalSchema = new Schema(
   {
+    name: String,
+
     employee: {
       type: Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: "User",
     },
 
     signature: String,
 
-    approvedAt: Date,
+    date: Date,
   },
   {
     _id: false,
@@ -54,14 +69,16 @@ const RequisitionSchema = new Schema<IRequisition>(
       required: true,
     },
 
-    // companyName: {
-    //   type: String,
-    //   required: true,
-    // },
+    companyName: {
+      type: String,
+      default: "BMS TECH LOGISTICS LTD",
+      trim: true,
+    },
 
     department: {
       type: String,
-      required: false,
+      default: "All",
+      trim: true,
     },
 
     date: {
@@ -69,32 +86,48 @@ const RequisitionSchema = new Schema<IRequisition>(
       default: Date.now,
     },
 
-    items: [ItemSchema],
+    items: {
+      type: [ItemSchema],
+      validate: {
+        validator: (items: unknown[]) =>
+          Array.isArray(items) && items.length > 0,
+        message: "At least one item is required",
+      },
+    },
 
     grandTotal: {
       type: Number,
       default: 0,
     },
 
-    // requestedBy: ApprovalSchema,
     requestedBy: {
-  type: String,
-  required: true,
-},
+      type: String,
+      required: [true, "Requested by is required"],
+      trim: true,
+    },
 
-    // checkedBy: ApprovalSchema,
+    requestedByUser: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    requestedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    checkedBy: ApprovalSchema,
 
     approvedBy: ApprovalSchema,
 
+    rejectedBy: ApprovalSchema,
+
+    rejectionReason: String,
+
     status: {
       type: String,
-      enum: [
-        "Pending",
-        // "Checked",
-        "Approved",
-        "Rejected",
-      ],
-      default: "Pending",
+      enum: Object.values(RequisitionStatus),
+      default: RequisitionStatus.PENDING,
     },
 
     remarks: String,
@@ -104,5 +137,7 @@ const RequisitionSchema = new Schema<IRequisition>(
   }
 );
 
-export const Requisition =
-  model<IRequisition>("Requisition", RequisitionSchema);
+export const Requisition = model<IRequisition>(
+  "Requisition",
+  RequisitionSchema
+);

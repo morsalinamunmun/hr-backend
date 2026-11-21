@@ -15,11 +15,13 @@ export interface IAttendance {
     timestamp: Date;
     location: ILocation;
     photo?: string;
+    remarks?: string;
   };
 
   check_out?: {
     timestamp: Date;
     location: ILocation;
     photo?: string;
+    remarks?: string;
   };
 }

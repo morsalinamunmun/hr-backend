@@ -69,11 +69,13 @@ const attendanceSchema = new Schema<IAttendance>(
       timestamp: Date,
       location: locationSchema,
       photo: String,
+      remarks: { type: String, trim: true },
     },
     check_out: {
       timestamp: Date,
       location: locationSchema,
       photo: String,
+      remarks: { type: String, trim: true },
     },
   },
   {

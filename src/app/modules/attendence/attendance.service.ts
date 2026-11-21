@@ -11,10 +11,16 @@ interface MarkAttendancePayload {
   photo?: string;
   timestamp: string | Date;
   type: "check-in" | "check-out";
+  remarks?: string;
 }
 
 const markAttendance = async (payload: MarkAttendancePayload) => {
   const { user_id, work_type, latitude, longitude, address, photo, timestamp, type } = payload;
+  // type onujayi check_in.remarks ba check_out.remarks e save hobe
+  const remarks =
+    typeof payload.remarks === "string" && payload.remarks.trim()
+      ? payload.remarks.trim()
+      : undefined;
 
   // আজকের date
   const today = new Date().toISOString().split("T")[0];
@@ -38,6 +44,7 @@ const markAttendance = async (payload: MarkAttendancePayload) => {
           timestamp: new Date(timestamp),
           location: { latitude, longitude, address },
           photo,
+          remarks,
         },
         // check_out intentionally not set - will be undefined
       });
@@ -47,6 +54,7 @@ const markAttendance = async (payload: MarkAttendancePayload) => {
         timestamp: new Date(timestamp),
         location: { latitude, longitude, address },
         photo,
+        remarks,
       };
       await attendance.save();
     }
@@ -78,6 +86,7 @@ const markAttendance = async (payload: MarkAttendancePayload) => {
       timestamp: new Date(timestamp),
       location: { latitude, longitude, address },
       photo,
+      remarks,
     };
     await attendance.save();
 
@@ -391,7 +400,39 @@ const updateCheckOut = async (userId: string, payload: Partial<MarkAttendancePay
   return { success: true, message: "Check-out updated successfully", data: attendance };
 };
 
+// Kono attendance record er check-in ba check-out remarks bosano / edit kora
+const updateRemarks = async (
+  id: string,
+  type?: string,
+  remarks?: string
+) => {
+  if (type !== "check-in" && type !== "check-out") {
+    return { success: false, message: "type must be 'check-in' or 'check-out'" };
+  }
+
+  const attendance = await Attendance.findById(id);
+
+  if (!attendance) {
+    return { success: false, message: "Attendance record not found" };
+  }
+
+  const key = type === "check-in" ? "check_in" : "check_out";
+
+  if (!attendance[key]?.timestamp) {
+    return { success: false, message: `No ${type} found for this record` };
+  }
+
+  attendance.set(
+    `${key}.remarks`,
+    typeof remarks === "string" ? remarks.trim() : ""
+  );
+  await attendance.save();
+
+  return { success: true, message: "Remarks updated successfully", data: attendance };
+};
+
 export const AttendanceService = {
+  updateRemarks,
   markAttendance,
   getUserAttendance,
   getAllAttendance,

@@ -39,5 +39,24 @@ export const AttendanceController = {
       message: "Failed to fetch attendance",
     });
   }
-}
+},
+
+  updateRemarks: async (req: Request, res: Response) => {
+    try {
+      const result = await AttendanceService.updateRemarks(
+        req.params.id,
+        req.body?.type,
+        req.body?.remarks
+      );
+      const status = result.success
+        ? 200
+        : result.message === "Attendance record not found"
+        ? 404
+        : 400;
+      res.status(status).json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Server Error" });
+    }
+  },
 };
