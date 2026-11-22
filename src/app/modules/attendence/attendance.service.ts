@@ -296,7 +296,7 @@ const getAllAttendance = async (query: any) => {
     ];
   }
 
-  const pipeline: any[] = [
+  const basePipeline: any[] = [
     {
       $match: attendanceMatch,
     },
@@ -321,36 +321,23 @@ const getAllAttendance = async (query: any) => {
           },
         ]
       : []),
-
-    {
-      $sort: {
-        date: -1,
-      },
-    },
-
-    {
-      $facet: {
-        data: [
-          {
-            $skip: skip,
-          },
-          {
-            $limit: Number(limit),
-          },
-        ],
-        total: [
-          {
-            $count: "count",
-          },
-        ],
-      },
-    },
   ];
 
-  const result = await Attendance.aggregate(pipeline);
+  // $facet sob data ekta document e rakhto -> photo (base64) er karone
+  // 16MB limit par hoye BSONObjectTooLarge error dito. Tai data ar count alada query.
+  const [data, totalResult] = await Promise.all([
+    Attendance.aggregate([
+      ...basePipeline,
+      { $sort: { date: -1 } },
+      { $skip: skip },
+      { $limit: Number(limit) },
+      // password / auth info response e pathano hobe na
+      { $project: { "user.password": 0, "user.auth": 0 } },
+    ]).allowDiskUse(true),
+    Attendance.aggregate([...basePipeline, { $count: "count" }]),
+  ]);
 
-  const data = result[0]?.data ?? [];
-  const total = result[0]?.total?.[0]?.count ?? 0;
+  const total = totalResult[0]?.count ?? 0;
 
   return {
     data,

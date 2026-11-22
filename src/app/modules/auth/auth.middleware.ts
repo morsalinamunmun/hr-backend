@@ -12,25 +12,29 @@ export const auth = (...roles: UserRole[]) => {
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "Unauthorized");
     }
+    let decoded: JwtPayload;
     try {
-      const decoded = jwt.verify(
+      decoded = jwt.verify(
         token,
         envVars.JWT_ACCESS_SECRET,
       ) as JwtPayload;
-      // req.user = decoded;
-       req.user = {
-        userId: decoded._id,
-        email: decoded.email,
-        role: decoded.role,
-      };
-
-      if (roles.length && !roles.includes(decoded.role)) {
-        throw new AppError(httpStatus.FORBIDDEN, "Forbidden: Access denied");
-      }
-
-      next();
     } catch {
       throw new AppError(httpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
+
+    // req.user = decoded;
+    req.user = {
+      userId: decoded._id,
+      email: decoded.email,
+      role: decoded.role,
+    };
+
+    // Role check try er baire: age eta catch e dhora pore "Invalid or expired token" (401)
+    // hoye jeto, ar frontend 401 peye user ke logout kore dito.
+    if (roles.length && !roles.includes(decoded.role)) {
+      throw new AppError(httpStatus.FORBIDDEN, "Forbidden: Access denied");
+    }
+
+    next();
   };
 };
